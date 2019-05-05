@@ -1,0 +1,38 @@
+{
+  "name": "@viva-eng/mysql-migrate",
+  "version": "1.0.0",
+  "description": "A utility defining, modifying, and migrating MySQL databases",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "tsc --build tsconfig.json"
+  },
+  "bin": {
+    "mysql-migrate": "./bin/mysql-migrate"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/viva-engineering/mysql-migrate.git"
+  },
+  "keywords": [
+    "logger"
+  ],
+  "author": "James Brumond <james@jbrumond.me> (http://www.jbrumond.me)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/viva-engineering/mysql-migrate/issues"
+  },
+  "homepage": "https://github.com/viva-engineering/mysql-migrate#readme",
+  "dependencies": {
+    "@types/mkdirp": "^0.5.2",
+    "@types/mysql": "^2.15.5",
+    "@types/node": "^11.11.4",
+    "@types/yargs": "^13.0.0",
+    "mkdirp": "^0.5.1",
+    "mysql": "^2.16.0",
+    "yargs": "^13.2.2"
+  },
+  "devDependencies": {
+    "tslint": "^5.14.0",
+    "typescript": "^3.3.4000"
+  }
+}

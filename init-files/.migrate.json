@@ -1,0 +1,15 @@
+{
+	"connection": {
+		"host": "localhost",
+		"port": 3360,
+		"username": "",
+		"password": "",
+		"database": ""
+	},
+	"scripts": {
+		"beforeUp": "",
+		"afterUp": "",
+		"beforeDown": "",
+		"afterDown": ""
+	}
+}
