@@ -4,6 +4,7 @@
   "description": "A utility defining, modifying, and migrating MySQL databases",
   "main": "build/index.js",
   "scripts": {
+    "start": "node ./build/bin/index",
     "build": "tsc --build tsconfig.json"
   },
   "bin": {

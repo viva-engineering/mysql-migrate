@@ -1,10 +1,11 @@
 
-import { init } from '../index';
-import { loadConfig } from '../config';
+import { bootstrap } from '../index';
+import { getEnvironmentConfig } from '../config';
 import { resolve, basename } from 'path';
 import { logger, setLogLevel, LogLevel } from '../logger';
 import { Argv, CommandModule, CommandBuilder, Arguments } from 'yargs';
 import { ConnectionArgs, addConnectionOptions } from './connection-options';
+import { mysqlUrl } from '../utils';
 
 type Args = ConnectionArgs & {
 	verbose: boolean;
@@ -22,10 +23,11 @@ const handler = async (args: Arguments<Args>) => {
 	const path = process.cwd();
 
 	try {
-		const config = await loadConfig(path);
+		const config = await getEnvironmentConfig(path, args.environment, args);
 
-		// await init(path);
-		// logger.info(`Created new project "${basename(path)}"`);
+		await bootstrap(config);
+
+		console.log(`Bootstrapped database at ${mysqlUrl(config)}`);
 		process.exit(0);
 	}
 
@@ -35,9 +37,9 @@ const handler = async (args: Arguments<Args>) => {
 	}
 };
 
-export const rollbackCommand: CommandModule<Args, Args> = {
-	command: 'rollback',
-	describe: 'Rolls back the database to the given version',
+export const bootstrapCommand: CommandModule<Args, Args> = {
+	command: 'bootstrap',
+	describe: 'Bootstraps a database',
 	handler: handler,
 	builder: builder
 };

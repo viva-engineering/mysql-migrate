@@ -15,7 +15,7 @@ const builder: CommandBuilder<Args, Args> = (yargs: Argv<Args>) => {
 			type: 'string',
 			default: '.',
 			describe: 'The directory to create the migration project in'
-		})
+		});
 };
 
 const handler = async (args: Arguments<Args>) => {
@@ -27,7 +27,8 @@ const handler = async (args: Arguments<Args>) => {
 
 	try {
 		await init(path);
-		logger.info(`Created new project "${basename(path)}"`);
+		
+		console.log(`Created new project "${basename(path)}"`);
 		process.exit(0);
 	}
 

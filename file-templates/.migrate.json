@@ -1,0 +1,11 @@
+{
+	"environments": {
+		"default": {
+			"host": "localhost",
+			"port": 3360,
+			"user": "",
+			"password": "",
+			"database": ""
+		}
+	}
+}

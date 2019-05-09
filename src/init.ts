@@ -1,19 +1,11 @@
 
 import { resolve } from 'path';
 import { logger } from './logger';
-import { now, mkdir, readFile, writeFile } from './utils';
-
-const initFileSource = resolve(__dirname, '../init-files');
+import { mkdir, copyFileTemplate } from './utils';
 
 export const init = async (root: string) => {
 	await createProjectRoot(root);
-
-	const [ bootstrapDir ] = await Promise.all([
-		createBootstrap(root),
-		createConfigFile(root)
-	]);
-
-	await createBootstrapUpFile(bootstrapDir);
+	await createConfigFile(root);
 };
 
 const createProjectRoot = async (root: string) => {
@@ -24,34 +16,10 @@ const createProjectRoot = async (root: string) => {
 	logger.verbose(`Directory "${root}" exists.`);
 };
 
-const createBootstrap = async (root: string) => {
-	const bootstrapDirectory = resolve(root, `./${now}-bootstrap`);
-
-	logger.verbose(`Creating directory "${bootstrapDirectory}" for bootstrap script...`);
-
-	await mkdir(bootstrapDirectory);
-
-	logger.verbose(`Bootstrap directory "${bootstrapDirectory}" created.`);
-
-	return bootstrapDirectory;
-};
-
 const createConfigFile = async (root: string) => {
 	logger.verbose(`Creating ".migrate.json" config file...`);
 
-	const contents = await readFile(initFileSource, '.migrate.json');
-
-	await writeFile(root, '.migrate.json', contents);
+	await copyFileTemplate('.migrate.json', root);
 
 	logger.verbose(`Config file ".migrate.json" created.`);
-};
-
-const createBootstrapUpFile = async (bootstrapDir: string) => {
-	logger.verbose(`Creating bootstrap DDL SQL...`);
-
-	const contents = await readFile(initFileSource, 'bootstrap.sql');
-
-	await writeFile(bootstrapDir, 'migrate.sql', contents);
-
-	logger.verbose(`Bootstrap DDL SQL created.`);
 };

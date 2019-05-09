@@ -1,6 +1,7 @@
 
 import * as mkdirp from 'mkdirp';
 import { createConnection } from 'mysql';
+import { DatabaseConfig } from './config';
 
 import { resolve } from 'path';
 import {
@@ -8,7 +9,9 @@ import {
 	writeFile as writeFileRaw
 } from 'fs';
 
-export const now = (new Date)
+const fileTemplates = resolve(__dirname, '../file-templates');
+
+export const now = () => (new Date)
 	.toISOString()
 	.split('.')[0]
 	.replace(/[^\d]/g, '');
@@ -51,4 +54,16 @@ export const writeFile = (dir: string, filename: string, contents: string | Buff
 			resolve();
 		});
 	});
+};
+
+export const copyFileTemplate = async (file: string, destDirectory: string, destFile: string = file) => {
+	const contents = await readFile(fileTemplates, file);
+
+	await writeFile(destDirectory, destFile, contents);
+};
+
+export const mysqlUrl = (config: DatabaseConfig, includeUser: boolean = true) : string => {
+	const user = includeUser ? `${config.user}@` : '';
+
+	return `mysql://${user}${config.host}:${config.port}/${config.database}`;
 };

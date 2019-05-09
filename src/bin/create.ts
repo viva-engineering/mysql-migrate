@@ -1,17 +1,21 @@
 
-import { init } from '../index';
+import { createMigration } from '../index';
 import { loadConfig } from '../config';
 import { resolve, basename } from 'path';
 import { logger, setLogLevel, LogLevel } from '../logger';
 import { Argv, CommandModule, CommandBuilder, Arguments } from 'yargs';
-import { ConnectionArgs, addConnectionOptions } from './connection-options';
 
-type Args = ConnectionArgs & {
+type Args = {
+	name: string;
 	verbose: boolean;
 }
 
 const builder: CommandBuilder<Args, Args> = (yargs: Argv<Args>) => {
-	return (addConnectionOptions(yargs) as Argv<Args>);
+	return yargs
+		.positional('name', {
+			type: 'string',
+			describe: 'The name of the new migration'
+		});
 };
 
 const handler = async (args: Arguments<Args>) => {
@@ -22,10 +26,12 @@ const handler = async (args: Arguments<Args>) => {
 	const path = process.cwd();
 
 	try {
-		const config = await loadConfig(path);
+		// We don't actually need the config, we just load it to ensure we're in a valid directory
+		await loadConfig(path);
 
-		// await init(path);
-		// logger.info(`Created new project "${basename(path)}"`);
+		const name = await createMigration(path, args.name);
+
+		console.log(`Created new migration "${name}"`);
 		process.exit(0);
 	}
 
@@ -35,9 +41,9 @@ const handler = async (args: Arguments<Args>) => {
 	}
 };
 
-export const rollbackCommand: CommandModule<Args, Args> = {
-	command: 'rollback',
-	describe: 'Rolls back the database to the given version',
+export const createCommand: CommandModule<Args, Args> = {
+	command: 'create [name]',
+	describe: 'Creates a new migration',
 	handler: handler,
-	builder: builder
+	builder
 };
