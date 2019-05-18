@@ -7,7 +7,7 @@ export const enum MigrationFiles {
 }
 
 export const enum TemplateFiles {
-	ConfigFile = '.migrate.json',
+	ConfigFile = '.mym.json',
 	Hooks = 'hook.js',
 	MigrateSQL = 'migrate.sql',
 	RollbackSQL = 'rollback.sql'

@@ -10,7 +10,7 @@ import { historyCommand } from './history';
 import { completion } from './completion';
 
 yargs
-	.scriptName('mysql-migrate')
+	.scriptName('mym')
 	.command(initCommand)
 	.command(bootstrapCommand)
 	.command(createCommand)
@@ -18,7 +18,7 @@ yargs
 	.command(migrateCommand)
 	.command(rollbackCommand)
 	.command(historyCommand)
-	.completion('completion', 'Outputs a bash completion script for mysql-migrate', completion)
+	.completion('completion', 'Outputs a bash completion script for mym', completion)
 	.option('v', {
 		alias: 'verbose',
 		default: false,

@@ -49,7 +49,7 @@ const handler = async (args: Arguments<MigrateArgs>) => {
 };
 
 export const migrateCommand: CommandModule<BaseArgs, MigrateArgs> = {
-	command: 'migrate [target]',
+	command: 'migrate',
 	describe: 'Migrates the database up to the given version',
 	handler: handler,
 	builder: builder
