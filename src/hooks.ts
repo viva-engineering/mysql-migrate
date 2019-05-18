@@ -25,7 +25,7 @@ export interface BeforeHook {
 export type AfterHookResult = void | PromiseLike<void>;
 
 export interface AfterHook {
-	(context: AfterHookContext): AfterHookResult;
+	(error: any, context: AfterHookContext): AfterHookResult;
 }
 
 export interface Hooks {

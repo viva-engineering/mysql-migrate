@@ -2,7 +2,7 @@
 import { DatabaseConfig } from './config';
 import { Actions, readRecentHistory, addHistoryRecord } from './history';
 import { listMigrations } from './list';
-import { connect, query } from './db';
+import { connect, query, QueryResult } from './db';
 import { logger } from './logger';
 import { Connection } from 'mysql';
 import { resolve } from 'path';
@@ -95,24 +95,53 @@ const runMigration = async (dir: string, connection: Connection, migration: stri
 	// Make sure we get any updates that the hook made to the SQL
 	const finalSql = await getSqlFromBeforeHookResult(originalSql, beforeHookResult);
 
-	// Run the migration script
-	const result = await query(connection, finalSql);
+	let error: any;
+	let result: QueryResult;
 
-	// Update the history table
-	await addHistoryRecord(connection, Actions.Migrate, migration);
+	try {
+		// Run the migration script
+		result = await query(connection, finalSql);
+	}
 
-	// Run the after hook
-	const afterHookResult = hooks.after({
-		action: Actions.Migrate,
-		version: migration,
-		sql: originalSql,
-		finalSql: finalSql,
-		result: result
-	});
+	catch (e) {
+		error = e;
+	}
 
-	// If the after hook returned a promise, wait for it to finish running
-	if (isPromiseLike(afterHookResult)) {
-		await afterHookResult;
+	if (error) {
+		// Run the after hook
+		const afterHookResult = hooks.after(error, {
+			action: Actions.Migrate,
+			version: migration,
+			sql: originalSql,
+			finalSql: finalSql,
+			result: result
+		});
+
+		// If the after hook returned a promise, wait for it to finish running
+		if (isPromiseLike(afterHookResult)) {
+			await afterHookResult;
+		}
+
+		throw error;
+	}
+
+	else {
+		// Update the history table
+		await addHistoryRecord(connection, Actions.Migrate, migration);
+
+		// Run the after hook
+		const afterHookResult = hooks.after(null, {
+			action: Actions.Migrate,
+			version: migration,
+			sql: originalSql,
+			finalSql: finalSql,
+			result: result
+		});
+
+		// If the after hook returned a promise, wait for it to finish running
+		if (isPromiseLike(afterHookResult)) {
+			await afterHookResult;
+		}
 	}
 };
 

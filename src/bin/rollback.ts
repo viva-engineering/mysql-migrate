@@ -18,14 +18,12 @@ const builder: CommandBuilder<BaseArgs, RollbackArgs> = (yargs: Argv<BaseArgs>) 
 			alias: 'target',
 			type: 'string',
 			describe: 'The name of the target version',
-			default: null,
 			conflicts: 'f'
 		})
 		.option('f', {
 			alias: 'full',
 			type: 'boolean',
-			describe: 'If provided, the database will be rolled back all the way to the initial state',
-			default: false,
+			describe: 'Rolls back the database all the way to the initial state',
 			conflicts: 't'
 		})
 		.group([ 't', 'f' ], 'Command Options');
@@ -41,7 +39,12 @@ const handler = async (args: Arguments<RollbackArgs>) => {
 	try {
 		const config = await getEnvironmentConfig(path, args.environment, args);
 
-		console.log(`Rolling back to new target version ${args.target}...`);
+		if (args.full) {
+			console.log('Rolling back all migrations...');
+		}
+		else {
+			console.log(`Rolling back to new target version ${args.target}...`);
+		}
 		
 		await rollback(path, config, args.target, args.full);
 		

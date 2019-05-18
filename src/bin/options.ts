@@ -19,7 +19,7 @@ export const addConnectionOptions = (yargs: Argv<BaseArgs>): Argv<ConnectionArgs
 		.option('e', {
 			alias: 'environment',
 			type: 'string',
-			describe: 'The environment from the config file to use',,
+			describe: 'The environment from the config file to use',
 			requiresArg: true,
 			default: 'default'
 		})
