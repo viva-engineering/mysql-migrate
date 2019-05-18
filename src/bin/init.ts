@@ -3,13 +3,14 @@ import { init } from '../index';
 import { resolve, basename } from 'path';
 import { logger, setLogLevel, LogLevel } from '../logger';
 import { Argv, CommandModule, CommandBuilder, Arguments } from 'yargs';
+import { exit } from './utils';
+import { BaseArgs } from './options';
 
-interface Args {
-	verbose: boolean;
+type InitArgs = BaseArgs & {
 	directory: string;
-}
+};
 
-const builder: CommandBuilder<Args, Args> = (yargs: Argv<Args>) => {
+const builder: CommandBuilder<BaseArgs, InitArgs> = (yargs: Argv<BaseArgs>) => {
 	return yargs
 		.positional('directory', {
 			type: 'string',
@@ -18,7 +19,7 @@ const builder: CommandBuilder<Args, Args> = (yargs: Argv<Args>) => {
 		});
 };
 
-const handler = async (args: Arguments<Args>) => {
+const handler = async (args: Arguments<InitArgs>) => {
 	if (args.verbose) {
 		setLogLevel(LogLevel.Verbose);
 	}
@@ -29,16 +30,18 @@ const handler = async (args: Arguments<Args>) => {
 		await init(path);
 		
 		console.log(`Created new project "${basename(path)}"`);
-		process.exit(0);
+		
+		await exit(0);
 	}
 
 	catch (error) {
 		logger.error(error);
-		process.exit(1);
+		
+		await exit(1);
 	}
 };
 
-export const initCommand: CommandModule<Args, Args> = {
+export const initCommand: CommandModule<BaseArgs, InitArgs> = {
 	command: 'init [directory]',
 	describe: 'Create a new migration project',
 	handler: handler,

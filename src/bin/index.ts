@@ -25,6 +25,7 @@ yargs
 		type: 'boolean',
 		describe: 'Enables verbose logging'
 	})
+	.demandCommand(1)
 	.help()
 	.wrap(Math.min(yargs.terminalWidth(), 120))
 	.argv;

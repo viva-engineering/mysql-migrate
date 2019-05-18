@@ -2,6 +2,7 @@
 import { resolve } from 'path';
 import { logger } from './logger';
 import { mkdir, copyFileTemplate } from './utils';
+import { TemplateFiles, ConfigFile } from './files';
 
 export const init = async (root: string) => {
 	await createProjectRoot(root);
@@ -17,9 +18,9 @@ const createProjectRoot = async (root: string) => {
 };
 
 const createConfigFile = async (root: string) => {
-	logger.verbose(`Creating ".migrate.json" config file...`);
+	logger.verbose(`Creating "${ConfigFile}" config file...`);
 
-	await copyFileTemplate('.migrate.json', root);
+	await copyFileTemplate(TemplateFiles.ConfigFile, root);
 
-	logger.verbose(`Config file ".migrate.json" created.`);
+	logger.verbose(`Config file "${ConfigFile}" created.`);
 };

@@ -2,6 +2,7 @@
 import { resolve } from 'path';
 import { logger } from './logger';
 import { now, mkdir, copyFileTemplate } from './utils';
+import { MigrationFiles, TemplateFiles } from './files';
 
 export const createMigration = async (dir: string, name: string) => {
 	const time = now();
@@ -10,10 +11,10 @@ export const createMigration = async (dir: string, name: string) => {
 
 	await createMigrationDirectory(migrationDir);
 	await Promise.all([
-		createMigrationFile(migrationDir, 'migrate.sql', 'migrate.sql'),
-		createMigrationFile(migrationDir, 'rollback.sql', 'rollback.sql'),
-		createMigrationFile(migrationDir, 'hook.js', 'migrate-hooks.js'),
-		createMigrationFile(migrationDir, 'hook.js', 'rollback-hooks.js')
+		createMigrationFile(migrationDir, TemplateFiles.MigrateSQL, MigrationFiles.MigrateSQL),
+		createMigrationFile(migrationDir, TemplateFiles.RollbackSQL, MigrationFiles.RollbackSQL),
+		createMigrationFile(migrationDir, TemplateFiles.Hooks, MigrationFiles.MigrateHooks),
+		createMigrationFile(migrationDir, TemplateFiles.Hooks, MigrationFiles.RollbackHooks)
 	]);
 
 	return timedName;

@@ -2,6 +2,7 @@
 import * as mkdirp from 'mkdirp';
 import { createConnection } from 'mysql';
 import { DatabaseConfig } from './config';
+import { BeforeHookResult } from './hooks';
 
 import { resolve } from 'path';
 import {
@@ -66,4 +67,28 @@ export const mysqlUrl = (config: DatabaseConfig, includeUser: boolean = true) : 
 	const user = includeUser ? `${config.user}@` : '';
 
 	return `mysql://${user}${config.host}:${config.port}/${config.database}`;
+};
+
+/**
+ * 
+ */
+export const getSqlFromBeforeHookResult = async (originalSql: string, result: BeforeHookResult) : Promise<string> => {
+	if (typeof result === 'string') {
+		return result;
+	}
+
+	if (isPromiseLike(result)) {
+		const promiseResult = await result;
+
+		return promiseResult || originalSql;
+	}
+
+	return originalSql;
+};
+
+/**
+ * 
+ */
+export const isPromiseLike = (value: any) : value is PromiseLike<any> => {
+	return typeof value.then === 'function';
 };

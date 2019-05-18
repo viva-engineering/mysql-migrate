@@ -24,3 +24,15 @@ export const formatHistoryRecord = (history: History, versionWidth: number = 50)
 
 	return `(${timestamp})  ${action}  ${version}      ${user}`;
 };
+
+export const flushConsole = () => {
+	return new Promise((resolve) => {
+		process.stdout.write('', resolve);
+	});
+};
+
+export const exit = async (exitCode: number) : Promise<void> => {
+	await flushConsole();
+
+	process.exit(exitCode);
+};

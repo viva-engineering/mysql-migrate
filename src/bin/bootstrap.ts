@@ -4,18 +4,17 @@ import { getEnvironmentConfig } from '../config';
 import { resolve, basename } from 'path';
 import { logger, setLogLevel, LogLevel } from '../logger';
 import { Argv, CommandModule, CommandBuilder, Arguments } from 'yargs';
-import { ConnectionArgs, addConnectionOptions } from './connection-options';
+import { BaseArgs, ConnectionArgs, addConnectionOptions } from './options';
 import { mysqlUrl } from '../utils';
+import { exit } from './utils';
 
-type Args = ConnectionArgs & {
-	verbose: boolean;
-}
+type BootstrapArgs = BaseArgs & ConnectionArgs;
 
-const builder: CommandBuilder<Args, Args> = (yargs: Argv<Args>) => {
-	return (addConnectionOptions(yargs) as Argv<Args>);
+const builder: CommandBuilder<BaseArgs, BootstrapArgs> = (yargs: Argv<BaseArgs>) => {
+	return (addConnectionOptions(yargs) as Argv<BootstrapArgs>);
 };
 
-const handler = async (args: Arguments<Args>) => {
+const handler = async (args: Arguments<BootstrapArgs>) => {
 	if (args.verbose) {
 		setLogLevel(LogLevel.Verbose);
 	}
@@ -28,16 +27,18 @@ const handler = async (args: Arguments<Args>) => {
 		await bootstrap(config);
 
 		console.log(`Bootstrapped database at ${mysqlUrl(config)}`);
-		process.exit(0);
+
+		await exit(0);
 	}
 
 	catch (error) {
 		logger.error(error);
-		process.exit(1);
+		
+		await exit(1);
 	}
 };
 
-export const bootstrapCommand: CommandModule<Args, Args> = {
+export const bootstrapCommand: CommandModule<BaseArgs, BootstrapArgs> = {
 	command: 'bootstrap',
 	describe: 'Bootstraps a database',
 	handler: handler,

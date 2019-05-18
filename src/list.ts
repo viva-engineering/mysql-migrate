@@ -36,6 +36,9 @@ export const listMigrations = (dir: string) : Promise<string[]> => {
 
 			await Promise.all(promises);
 
+			// Make sure the list of migrations comes back in sorted order
+			migrations.sort();
+
 			resolve(migrations);
 		});
 	});

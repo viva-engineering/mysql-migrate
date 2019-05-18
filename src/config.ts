@@ -1,16 +1,17 @@
 
 import { readFile } from './utils';
-import { ConnectionArgs } from './bin/connection-options';
+import { ConnectionArgs } from './bin/options';
+import { ConfigFile } from './files';
 
 export const loadConfig = async (dir: string) : Promise<Config> => {
-	return JSON.parse(await readFile(dir, '.migrate.json'));
+	return JSON.parse(await readFile(dir, ConfigFile));
 };
 
 export const getEnvironmentConfig = async (dir: string, env: string, overrides?: ConnectionArgs) : Promise<DatabaseConfig> => {
 	const envs = (await loadConfig(dir)).environments;
 
 	if (! envs[env]) {
-		throw new Error(`Environment ${env} does not exist in .migrate.json`);
+		throw new Error(`Environment ${env} does not exist in ${ConfigFile}`);
 	}
 
 	const config = envs[env];

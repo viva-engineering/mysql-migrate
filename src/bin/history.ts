@@ -4,25 +4,26 @@ import { getEnvironmentConfig } from '../config';
 import { resolve, basename } from 'path';
 import { logger, setLogLevel, LogLevel } from '../logger';
 import { Argv, CommandModule, CommandBuilder, Arguments } from 'yargs';
-import { ConnectionArgs, addConnectionOptions } from './connection-options';
-import { formatHistoryRecordList } from './utils';
+import { BaseArgs, ConnectionArgs, addConnectionOptions } from './options';
+import { formatHistoryRecordList, exit } from './utils';
 import { mysqlUrl } from '../utils';
 
-type Args = ConnectionArgs & {
-	verbose: boolean;
+type HistoryArgs = BaseArgs & ConnectionArgs & {
+	num: number;
 };
 
-const builder: CommandBuilder<Args, Args> = (yargs: Argv<Args>) => {
-	return (addConnectionOptions(yargs) as Argv<Args>)
+const builder: CommandBuilder<BaseArgs, HistoryArgs> = (yargs: Argv<BaseArgs>) => {
+	return (addConnectionOptions(yargs) as Argv<HistoryArgs>)
 		.option('n', {
 			alias: 'num',
 			type: 'number',
 			describe: 'The number of history records to retrieve',
-			default: 10
-		});
+			default: 1
+		})
+		.group([ 'n' ], 'Command Options');
 };
 
-const handler = async (args: Arguments<Args>) => {
+const handler = async (args: Arguments<HistoryArgs>) => {
 	if (args.verbose) {
 		setLogLevel(LogLevel.Verbose);
 	}
@@ -31,7 +32,7 @@ const handler = async (args: Arguments<Args>) => {
 
 	try {
 		const config = await getEnvironmentConfig(path, args.environment);
-		const history = await getHistory(config);
+		const history = await getHistory(config, args.num);
 		const output = formatHistoryRecordList(history);
 
 		console.log(`Migration history [${mysqlUrl(config, false)}]:`);
@@ -46,16 +47,17 @@ const handler = async (args: Arguments<Args>) => {
 			});
 		}
 
-		process.exit(0);
+		await exit(0);
 	}
 
 	catch (error) {
 		logger.error(error);
-		process.exit(1);
+		
+		await exit(1);
 	}
 };
 
-export const historyCommand: CommandModule<Args, Args> = {
+export const historyCommand: CommandModule<BaseArgs, HistoryArgs> = {
 	command: 'history',
 	describe: 'Returns the recent migration history of the database',
 	handler: handler,

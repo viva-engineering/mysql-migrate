@@ -4,13 +4,14 @@ import { loadConfig } from '../config';
 import { resolve, basename } from 'path';
 import { logger, setLogLevel, LogLevel } from '../logger';
 import { Argv, CommandModule, CommandBuilder, Arguments } from 'yargs';
+import { exit } from './utils';
+import { BaseArgs } from './options';
 
-type Args = {
+type CreateArgs = BaseArgs & {
 	name: string;
-	verbose: boolean;
 }
 
-const builder: CommandBuilder<Args, Args> = (yargs: Argv<Args>) => {
+const builder: CommandBuilder<BaseArgs, CreateArgs> = (yargs: Argv<BaseArgs>) => {
 	return yargs
 		.positional('name', {
 			type: 'string',
@@ -18,7 +19,7 @@ const builder: CommandBuilder<Args, Args> = (yargs: Argv<Args>) => {
 		});
 };
 
-const handler = async (args: Arguments<Args>) => {
+const handler = async (args: Arguments<CreateArgs>) => {
 	if (args.verbose) {
 		setLogLevel(LogLevel.Verbose);
 	}
@@ -32,17 +33,19 @@ const handler = async (args: Arguments<Args>) => {
 		const name = await createMigration(path, args.name);
 
 		console.log(`Created new migration "${name}"`);
-		process.exit(0);
+		
+		await exit(0);
 	}
 
 	catch (error) {
 		logger.error(error);
-		process.exit(1);
+
+		await exit(1);
 	}
 };
 
-export const createCommand: CommandModule<Args, Args> = {
-	command: 'create [name]',
+export const createCommand: CommandModule<BaseArgs, CreateArgs> = {
+	command: 'create <name>',
 	describe: 'Creates a new migration',
 	handler: handler,
 	builder

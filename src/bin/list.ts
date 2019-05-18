@@ -4,17 +4,16 @@ import { loadConfig } from '../config';
 import { resolve, basename } from 'path';
 import { logger, setLogLevel, LogLevel } from '../logger';
 import { Argv, CommandModule, CommandBuilder, Arguments } from 'yargs';
-import { ConnectionArgs, addConnectionOptions } from './connection-options';
+import { BaseArgs, ConnectionArgs, addConnectionOptions } from './options';
+import { exit } from './utils';
 
-type Args = ConnectionArgs & {
-	verbose: boolean;
-}
+type ListArgs = BaseArgs & ConnectionArgs;
 
-const builder: CommandBuilder<Args, Args> = (yargs: Argv<Args>) => {
-	return (addConnectionOptions(yargs) as Argv<Args>);
+const builder: CommandBuilder<BaseArgs, ListArgs> = (yargs: Argv<BaseArgs>) => {
+	return (addConnectionOptions(yargs) as Argv<ListArgs>);
 };
 
-const handler = async (args: Arguments<Args>) => {
+const handler = async (args: Arguments<ListArgs>) => {
 	if (args.verbose) {
 		setLogLevel(LogLevel.Verbose);
 	}
@@ -26,16 +25,18 @@ const handler = async (args: Arguments<Args>) => {
 		const migrations = await listMigrations(path);
 
 		console.log(migrations.join('\n'));
-		process.exit(0);
+		
+		await exit(0);
 	}
 
 	catch (error) {
 		logger.error(error);
-		process.exit(1);
+		
+		await exit(1);
 	}
 };
 
-export const listCommand: CommandModule<Args, Args> = {
+export const listCommand: CommandModule<BaseArgs, ListArgs> = {
 	command: 'list',
 	describe: 'Lists out all existing migrations',
 	handler: handler,
