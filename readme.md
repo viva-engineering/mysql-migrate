@@ -57,3 +57,77 @@ After you fill in all the fields with your database configuration, you'll need t
 ```bash
 $ mym bootstrap
 ```
+
+### Creating new database migrations
+
+Creating a new migration is as simple as calling `mym create`
+
+```bash
+$ mym create my-new-migration
+```
+
+This will create a new directory inside your project like `0000-my-new-migration` which will contain a number of files.
+
+_Note: The name of the directory is important, as the migrations must be stored in sorted order, and so are prefixed with a timestamp. Renaming the directory can lead to unintended side-effects._
+
+```
+migrate.sql
+migrate-hooks.js
+rollback.sql
+rollback-hooks.js
+```
+
+The `migrate.sql` file contains the query (or queries) that will run when the migration is executed; Likewise, the `rollback.sql` file contains any queries to run when rolling back the migration. The `migrate-hooks.js` and `rollback-hooks.js` files allow you to write JavaScript functions that will be run before and/or after then migration and rollback are run.
+
+
+
+
+
+
+### Hooks
+
+The hooks files alongside your migration and rollback scripts allow you define functions to execute before and after the scripts execute. However, they also have one other function. The before hooks also enable to make modifications to the queries before they are run, such as populating variables, or even replacing the query completely. If your before hook returns a string (or returns a promise that resolves to a string), the string will be treated as a query to be exectued in place of the script contents.
+
+###### migrate-hooks.js
+
+```javascript
+exports.before = async (params) => {
+  // This tells you what type of action is being performed
+  // ("migrate" or "rollback")
+  console.log(params.action);
+
+  // This tells you migration version of the script
+  // being run (the name of the directory the script is in)
+  console.log(params.version);
+
+  // This is the SQL from the script file
+  console.log(params.sql);
+};
+
+exports.after = async (error, params) => {
+  // If an error occured, it will be passed in here
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+  // This tells you what type of action is being performed
+  // ("migrate" or "rollback")
+  console.log(params.action);
+
+  // This tells you migration version of the script
+  // being run (the name of the directory the script is in)
+  console.log(params.version);
+
+  // This is the SQL from the script file
+  console.log(params.sql);
+
+  // This is the SQL that was actually executed (different
+  // from the file contents if it was modified by your
+  // before hook)
+  console.log(params.finalSql);
+
+  // This is the result from the MySQL query call
+  console.log(params.result);
+};
+```
