@@ -8,7 +8,8 @@ import { BaseArgs, ConnectionArgs, addConnectionOptions } from './options';
 import { exit } from './utils';
 
 type MigrateArgs = BaseArgs & ConnectionArgs & {
-	target: string;
+	target?: string;
+	full: boolean;
 }
 
 const builder: CommandBuilder<BaseArgs, MigrateArgs> = (yargs: Argv<BaseArgs>) => {
@@ -17,9 +18,15 @@ const builder: CommandBuilder<BaseArgs, MigrateArgs> = (yargs: Argv<BaseArgs>) =
 			alias: 'target',
 			type: 'string',
 			describe: 'The name of the target version',
-			demand: true
+			conflicts: 'f'
 		})
-		.group([ 't' ], 'Command Options');
+		.option('f', {
+			alias: 'full',
+			type: 'boolean',
+			describe: 'Migrates the database all the way, running every not already run migration',
+			conflicts: 't'
+		})
+		.group([ 't', 'f' ], 'Command Options');
 };
 
 const handler = async (args: Arguments<MigrateArgs>) => {
@@ -32,9 +39,14 @@ const handler = async (args: Arguments<MigrateArgs>) => {
 	try {
 		const config = await getEnvironmentConfig(path, args.environment, args);
 
-		console.log(`Migrating to new target version ${args.target}...`);
+		if (args.full) {
+			console.log('Running full migration...');
+		}
+		else {
+			console.log(`Migrating to new target version ${args.target}...`);
+		}
 		
-		await migrate(path, config, args.target);
+		await migrate(path, config, args.target, args.full);
 		
 		console.log('Migration complete');
 		

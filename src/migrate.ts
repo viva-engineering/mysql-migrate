@@ -13,7 +13,7 @@ import { readFile, getSqlFromBeforeHookResult, isPromiseLike } from './utils';
 /**
  * 
  */
-export const migrate = (dir: string, config: DatabaseConfig, targetMigration: string) : Promise<string[]> => {
+export const migrate = (dir: string, config: DatabaseConfig, targetMigration: string, full?: boolean) : Promise<string[]> => {
 	return new Promise(async (resolve, reject) => {
 		const connection = await connect(config);
 
@@ -28,7 +28,15 @@ export const migrate = (dir: string, config: DatabaseConfig, targetMigration: st
 			}
 
 			const currentVersion = findVersion(migrations, history[0].version);
-			const desiredVersion = findVersion(migrations, targetMigration);
+			let desiredVersion: number;
+
+			if (full) {
+				desiredVersion = migrations.length - 1;
+			}
+
+			else {
+				desiredVersion = findVersion(migrations, targetMigration);
+			}
 
 			if (desiredVersion < 0) {
 				throw new Error(`Migration ${targetMigration} not found`);
