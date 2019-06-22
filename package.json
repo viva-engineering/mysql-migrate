@@ -1,6 +1,6 @@
 {
   "name": "@viva-eng/mysql-migrate",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A utility defining, modifying, and migrating MySQL databases",
   "main": "build/index.js",
   "scripts": {
