@@ -4,7 +4,7 @@ import { DatabaseConfig } from './config';
 import { createConnection, format, Connection, FieldInfo } from 'mysql';
 import { mysqlUrl } from './utils';
 
-export const connect = (config: DatabaseConfig) : Promise<Connection> => {
+export const connect = (config: DatabaseConfig, multipleStatements: boolean = true) : Promise<Connection> => {
 	logger.verbose(`Connecting to database at ${mysqlUrl(config)}...`);
 
 	return new Promise((resolve, reject) => {
@@ -13,7 +13,7 @@ export const connect = (config: DatabaseConfig) : Promise<Connection> => {
 			port: config.port,
 			user: config.user,
 			password: config.password,
-			multipleStatements: true,
+			multipleStatements: multipleStatements,
 			dateStrings: true,
 			trace: true
 		});

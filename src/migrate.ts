@@ -47,7 +47,7 @@ export const migrate = (dir: string, config: DatabaseConfig, targetMigration: st
 			}
 
 			for (let i = currentVersion + 1; i <= desiredVersion; i++) {
-				await runMigration(dir, connection, migrations[i]);
+				await runMigration(dir, config, connection, migrations[i]);
 			}
 
 			resolve();
@@ -86,7 +86,7 @@ const findVersion = (migrations: string[], version: string) => {
 /**
  * Runs the specified migration on the given database connection
  */
-const runMigration = async (dir: string, connection: Connection, migration: string) => {
+const runMigration = async (dir: string, config: DatabaseConfig, connection: Connection, migration: string) => {
 	const migrationDir = resolve(dir, migration);
 	const hooks = getHooks(migrationDir);
 
@@ -104,15 +104,35 @@ const runMigration = async (dir: string, connection: Connection, migration: stri
 	const finalSql = await getSqlFromBeforeHookResult(originalSql, beforeHookResult);
 
 	let error: any;
-	let result: QueryResult;
+	let result: QueryResult | QueryResult[];
+	let singleQueryConnection: Connection;
 
 	try {
-		// Run the migration script
-		result = await query(connection, finalSql);
+		if (Array.isArray(finalSql)) {
+			result = [ ];
+			
+			// Need a new connection that is not in multi-statement mode
+			singleQueryConnection = await connect(config, false);
+
+			for (let i = 0; i < finalSql.length; i++) {
+				result.push(await query(connection, finalSql[i]));
+			}
+		}
+
+		else {
+			result = await query(connection, finalSql);
+		}
 	}
 
 	catch (e) {
 		error = e;
+	}
+
+	finally {
+		// If we created a new connection, make sure it gets cleaned up
+		if (singleQueryConnection) {
+			singleQueryConnection.destroy();
+		}
 	}
 
 	if (error) {

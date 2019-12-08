@@ -12,11 +12,11 @@ export interface AfterHookContext {
 	action: Actions.Migrate | Actions.Rollback;
 	version: string;
 	sql: string;
-	finalSql: string;
-	result: QueryResult;
+	finalSql: string | string[];
+	result: QueryResult | QueryResult[];
 }
 
-export type BeforeHookResult = void | string | PromiseLike<void> | PromiseLike<string>;
+export type BeforeHookResult = void | string | string[] | PromiseLike<void> | PromiseLike<string> | PromiseLike<string[]>;
 
 export interface BeforeHook {
 	(context: BeforeHookContext): BeforeHookResult;

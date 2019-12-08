@@ -14,7 +14,7 @@ export interface ConnectionArgs {
 	database?: string;
 }
 
-export const addConnectionOptions = (yargs: Argv<BaseArgs>): Argv<ConnectionArgs> => {
+export const addConnectionOptions = (yargs: Argv<BaseArgs>) : Argv<ConnectionArgs> => {
 	return yargs
 		.option('e', {
 			alias: 'environment',
@@ -54,5 +54,5 @@ export const addConnectionOptions = (yargs: Argv<BaseArgs>): Argv<ConnectionArgs
 			requiresArg: true,
 		})
 		.group([ 'e', 'h', 'p', 'u', 'pw', 'd' ], 'Connection Info')
-		.conflicts('e', [ 'h', 'p', 'u', 'pw', 'd' ]);
+		.conflicts('e', [ 'h', 'p', 'u', 'pw', 'd' ]) as any as Argv<ConnectionArgs>;
 };

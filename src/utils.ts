@@ -72,8 +72,8 @@ export const mysqlUrl = (config: DatabaseConfig, includeUser: boolean = true) : 
 /**
  * 
  */
-export const getSqlFromBeforeHookResult = async (originalSql: string, result: BeforeHookResult) : Promise<string> => {
-	if (typeof result === 'string') {
+export const getSqlFromBeforeHookResult = async (originalSql: string, result: BeforeHookResult) : Promise<string | string[]> => {
+	if (typeof result === 'string' || Array.isArray(result)) {
 		return result;
 	}
 
