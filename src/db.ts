@@ -38,22 +38,13 @@ export const connect = (config: DatabaseConfig, multipleStatements: boolean = tr
 	});
 };
 
-const setDatabase = (connection: Connection, database: string) : Promise<void> => {
-	return new Promise((resolve, reject) => {
-		logger.verbose(`Selecting database ${database} (creating if not exists)...`);
+const setDatabase = async (connection: Connection, database: string) : Promise<void> => {
+	logger.verbose(`Selecting database ${database} (creating if not exists)...`);
 
-		const query = format('create database if not exists ??; use ??;', [ database, database ]);
+	await query(connection, format('create database if not exists ??', [ database ]));
+	await query(connection, format('use ??', [ database ]));
 
-		connection.query(query, (error) => {
-			if (error) {
-				return reject(error);
-			}
-
-			logger.verbose('Database selected.');
-
-			resolve();
-		});
-	});
+	logger.verbose('Database selected.');
 };
 
 export interface QueryResult {
