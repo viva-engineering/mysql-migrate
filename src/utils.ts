@@ -90,5 +90,5 @@ export const getSqlFromBeforeHookResult = async (originalSql: string, result: Be
  * 
  */
 export const isPromiseLike = (value: any) : value is PromiseLike<any> => {
-	return typeof value.then === 'function';
+	return value != null && typeof value.then === 'function';
 };
